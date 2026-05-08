@@ -1,181 +1,189 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Swiggy Number Checker</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-  <style>
-    * {
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
-    }
+<title>Swiggy Number Checker</title>
 
-    body {
-      margin: 0;
-      background: linear-gradient(135deg, #111, #1c1c1c);
-      color: white;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    }
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
+}
 
-    .card {
-      width: 100%;
-      max-width: 420px;
-      background: #1f1f1f;
-      border-radius: 18px;
-      padding: 24px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.45);
-      text-align: center;
-    }
+body{
+    background:#f5f5f5;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+    padding:20px;
+}
 
-    h1 {
-      margin: 0 0 20px;
-      font-size: 24px;
-      color: #ff3f6c;
-    }
+.container{
+    width:100%;
+    max-width:380px;
+    background:#fff;
+    border-radius:18px;
+    padding:25px;
+    box-shadow:0 8px 25px rgba(0,0,0,0.08);
+}
 
-    .row {
-      display: flex;
-      gap: 10px;
-    }
+.logo{
+    text-align:center;
+    font-size:28px;
+    font-weight:bold;
+    color:#fc8019;
+    margin-bottom:25px;
+}
 
-    input {
-      flex: 1;
-      padding: 14px;
-      border: none;
-      border-radius: 10px;
-      font-size: 16px;
-      outline: none;
-    }
+.inputBox{
+    margin-bottom:15px;
+}
 
-    button {
-      border: none;
-      padding: 14px 18px;
-      border-radius: 10px;
-      background: #ff3f6c;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-    }
+input{
+    width:100%;
+    padding:14px;
+    border:1px solid #ddd;
+    border-radius:12px;
+    outline:none;
+    font-size:16px;
+}
 
-    #loading {
-      margin-top: 14px;
-      font-size: 14px;
-      opacity: 0.8;
-    }
+button{
+    width:100%;
+    border:none;
+    padding:14px;
+    border-radius:12px;
+    background:#fc8019;
+    color:#fff;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+}
 
-    #result {
-      margin-top: 18px;
-      padding: 14px;
-      border-radius: 12px;
-      display: none;
-      word-break: break-word;
-    }
+button:hover{
+    opacity:.95;
+}
 
-    .footer {
-      margin-top: 20px;
-      font-size: 13px;
-    }
+.result{
+    margin-top:20px;
+    padding:14px;
+    border-radius:12px;
+    text-align:center;
+    font-weight:bold;
+    display:none;
+}
 
-    .footer span {
-      color: #00ff9d;
-    }
+.success{
+    background:#e7f8ec;
+    color:#138a36;
+}
 
-    small {
-      display: block;
-      margin-top: 10px;
-      opacity: 0.8;
-      font-size: 12px;
-    }
-  </style>
+.error{
+    background:#ffe8e8;
+    color:#d62828;
+}
+
+.loading{
+    background:#fff4e6;
+    color:#fc8019;
+}
+.footer{
+    margin-top:18px;
+    text-align:center;
+    font-size:13px;
+    color:#777;
+}
+</style>
 </head>
+
 <body>
 
-  <div class="card">
-    <h1>Number Checker</h1>
+<div class="container">
 
-    <div class="row">
-      <input
-        type="number"
-        id="phone"
-        placeholder="Enter mobile number"
-      />
-      <button onclick="checkNumber()">Check</button>
+    <div class="logo">Swiggy Checker</div>
+
+    <div class="inputBox">
+        <input type="tel" id="number" placeholder="Enter Mobile Number">
     </div>
 
-    <div id="loading"></div>
-    <div id="result"></div>
+    <button onclick="checkNumber()">Check Number</button>
+
+    <div id="result" class="result"></div>
 
     <div class="footer">
-      Made with ❤️ by Vishal | <span>RAIGANJLOOTERS</span>
+        Made with ❤️ by Vishal
     </div>
-  </div>
 
-  <script>
-    async function checkNumber() {
-      const phone = document.getElementById("phone").value.trim();
-      const loading = document.getElementById("loading");
-      const result = document.getElementById("result");
+</div>
 
-      if (phone.length < 10) {
-        alert("Enter valid mobile number");
+<script>
+async function checkNumber(){
+
+    const number = document.getElementById("number").value.trim();
+    const resultBox = document.getElementById("result");
+
+    if(number.length !== 10){
+        resultBox.style.display = "block";
+        resultBox.className = "result error";
+        resultBox.innerHTML = "Enter valid 10 digit number";
         return;
-      }
+    }
 
-      loading.innerText = "Checking...";
-      result.style.display = "none";
-      result.innerHTML = "";
+    resultBox.style.display = "block";
+    resultBox.className = "result loading";
+    resultBox.innerHTML = "Checking Number...";
 
-      try {
-        const res = await fetch("/api/check", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ phone })
+    try{
+
+        const response = await fetch("https://www.swiggy.com/mapi/auth/signin-check",{
+            method:"POST",
+            headers:{
+                "content-type":"application/json"
+            },
+            body:JSON.stringify({
+                mobile:number,
+                countryCode:"+91"
+            })
         });
 
-        const data = await res.json();
+        const data = await response.json();
 
-        loading.innerText = "";
-        result.style.display = "block";
+        console.log(data);
 
-        if (data.registered === true) {
-          result.innerHTML = `
-            🔴 Registered Number
-            <small>${data.debugMessage || ""}</small>
-          `;
-          result.style.background = "#2a0b0b";
-          result.style.color = "#ff4d4d";
-        } else if (data.registered === false) {
-          result.innerHTML = `
-            🟢 Fresh Number
-            <small>${data.debugMessage || ""}</small>
-          `;
-          result.style.background = "#062e1f";
-          result.style.color = "#00ff9d";
-        } else {
-          result.innerHTML = `
-            ⚠ Unable to verify
-            <small>${data.debugMessage || "No response details"}</small>
-          `;
-          result.style.background = "#2d2408";
-          result.style.color = "#ffd54a";
+        /*
+            Common response examples:
+            registered = true
+            registered = false
+        */
+
+        if(data.registered === true){
+
+            resultBox.className = "result success";
+            resultBox.innerHTML = "✅ Registered On Swiggy";
+
+        }else{
+
+            resultBox.className = "result error";
+            resultBox.innerHTML = "❌ Not Registered";
+
         }
 
-      } catch (err) {
-        loading.innerText = "";
-        result.style.display = "block";
-        result.innerHTML = "❌ API Error";
-        result.style.background = "#2a0b0b";
-        result.style.color = "#ff4d4d";
-      }
+    }catch(err){
+
+        console.log(err);
+
+        resultBox.className = "result error";
+        resultBox.innerHTML = "⚠ Request Failed / CORS Error";
+
     }
-  </script>
+
+}
+</script>
 
 </body>
 </html>
