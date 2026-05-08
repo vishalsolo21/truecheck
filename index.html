@@ -3,11 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Swiggy Checker</title>
 
 <style>
-
 *{
     margin:0;
     padding:0;
@@ -37,13 +35,8 @@ body{
     text-align:center;
     font-size:48px;
     font-weight:800;
-    line-height:1.1;
     color:#fc8019;
     margin-bottom:35px;
-}
-
-.inputBox{
-    margin-bottom:20px;
 }
 
 input{
@@ -54,11 +47,6 @@ input{
     padding:0 20px;
     font-size:20px;
     outline:none;
-    transition:.2s;
-}
-
-input:focus{
-    border-color:#fc8019;
 }
 
 button{
@@ -70,12 +58,8 @@ button{
     color:#fff;
     font-size:22px;
     font-weight:700;
+    margin-top:20px;
     cursor:pointer;
-    transition:.2s;
-}
-
-button:hover{
-    opacity:.95;
 }
 
 .result{
@@ -106,10 +90,8 @@ button:hover{
 .footer{
     margin-top:30px;
     text-align:center;
-    font-size:16px;
     color:#777;
 }
-
 </style>
 </head>
 
@@ -118,17 +100,15 @@ button:hover{
 <div class="container">
 
     <div class="logo">
-        Swiggy<br>Checker
+        Swiggy Checker
     </div>
 
-    <div class="inputBox">
-        <input
-            type="tel"
-            id="number"
-            maxlength="10"
-            placeholder="Enter Mobile Number"
-        >
-    </div>
+    <input
+        type="tel"
+        id="number"
+        maxlength="10"
+        placeholder="Enter Mobile Number"
+    >
 
     <button onclick="checkNumber()">
         Check Number
@@ -144,79 +124,45 @@ button:hover{
 
 <script>
 
-async function generateSignature(body){
-
-    const encoder = new TextEncoder();
-
-    const key = "storelex";
-
-    const data = encoder.encode(body + key);
-
-    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-
-    return hashArray
-        .map(b => b.toString(16).padStart(2, "0"))
-        .join("");
-}
-
 async function checkNumber(){
 
-    const number = document.getElementById("number").value.trim();
+    const number =
+        document.getElementById("number").value.trim();
 
-    const resultBox = document.getElementById("result");
+    const resultBox =
+        document.getElementById("result");
 
     if(number.length !== 10){
 
         resultBox.style.display = "block";
         resultBox.className = "result error";
-        resultBox.innerHTML = "⚠ Enter Valid 10 Digit Number";
+        resultBox.innerHTML =
+            "⚠ Enter Valid Number";
 
         return;
     }
 
     resultBox.style.display = "block";
     resultBox.className = "result loading";
-    resultBox.innerHTML = "⏳ Checking Number...";
+    resultBox.innerHTML = "⏳ Checking...";
 
     try{
 
-        const payload = {
-            type:"swiggy",
-            numbers:[number],
-            timestamp:Math.floor(Date.now()/1000)
-        };
-
-        const body = JSON.stringify(payload);
-
-        const signature = await generateSignature(body);
-
-        const response = await fetch(
-            "https://storelex.store/?api=1",
-            {
-                method:"POST",
-
-                headers:{
-                    "Content-Type":"application/json",
-                    "X-App-Signature":signature,
-                    "Referer":"https://storelex.store/#swiggy"
-                },
-
-                body:body
-            }
-        );
+        const response = await fetch("/api/check",{
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+                number:number
+            })
+        });
 
         const data = await response.json();
 
         console.log(data);
 
-        const registered =
-            data?.results?.[number]?.registered;
-
-        resultBox.style.display = "block";
-
-        if(registered){
+        if(data.registered){
 
             resultBox.className = "result success";
             resultBox.innerHTML =
@@ -235,12 +181,12 @@ async function checkNumber(){
         console.log(err);
 
         resultBox.className = "result error";
-        resultBox.innerHTML = "⚠ Server Error";
+        resultBox.innerHTML =
+            "⚠ Server Error";
 
     }
 
 }
-
 </script>
 
 </body>
