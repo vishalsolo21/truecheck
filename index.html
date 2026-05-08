@@ -182,10 +182,12 @@ async function checkNumber(){
 
         console.log(data);
 
-        if(
-            data?.data?.is_registered === true ||
-            data?.registered === true
-        ){
+        const exists =
+            data?.data?.statusCode === 2 ||
+            data?.statusCode === 2 ||
+            data?.message?.toLowerCase()?.includes("exists");
+
+        if(exists){
 
             resultBox.className = "result success";
             resultBox.innerHTML = "✅ Registered On Swiggy";
