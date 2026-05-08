@@ -7,19 +7,20 @@
 <title>Swiggy Number Checker</title>
 
 <style>
+
 *{
     margin:0;
     padding:0;
     box-sizing:border-box;
-    font-family:Arial, sans-serif;
+    font-family:Arial,sans-serif;
 }
 
 body{
-    background:#f5f5f5;
+    background:#f3f4f6;
+    min-height:100vh;
     display:flex;
     justify-content:center;
     align-items:center;
-    min-height:100vh;
     padding:20px;
 }
 
@@ -27,42 +28,49 @@ body{
     width:100%;
     max-width:380px;
     background:#fff;
-    border-radius:18px;
-    padding:25px;
-    box-shadow:0 8px 25px rgba(0,0,0,0.08);
+    border-radius:26px;
+    padding:28px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.08);
 }
 
 .logo{
     text-align:center;
-    font-size:28px;
-    font-weight:bold;
+    font-size:42px;
+    font-weight:800;
     color:#fc8019;
-    margin-bottom:25px;
+    margin-bottom:28px;
 }
 
 .inputBox{
-    margin-bottom:15px;
+    margin-bottom:18px;
 }
 
 input{
     width:100%;
-    padding:14px;
-    border:1px solid #ddd;
-    border-radius:12px;
+    height:64px;
+    border-radius:18px;
+    border:2px solid #e5e7eb;
+    padding:0 18px;
+    font-size:18px;
     outline:none;
-    font-size:16px;
+    transition:0.2s;
+}
+
+input:focus{
+    border-color:#fc8019;
 }
 
 button{
     width:100%;
+    height:62px;
     border:none;
-    padding:14px;
-    border-radius:12px;
+    border-radius:18px;
     background:#fc8019;
     color:#fff;
-    font-size:16px;
-    font-weight:bold;
+    font-size:22px;
+    font-weight:700;
     cursor:pointer;
+    transition:0.2s;
 }
 
 button:hover{
@@ -70,34 +78,37 @@ button:hover{
 }
 
 .result{
-    margin-top:20px;
-    padding:14px;
-    border-radius:12px;
+    margin-top:22px;
+    padding:18px;
+    border-radius:18px;
     text-align:center;
-    font-weight:bold;
+    font-size:20px;
+    font-weight:700;
     display:none;
 }
 
 .success{
-    background:#e7f8ec;
-    color:#138a36;
+    background:#e8fff1;
+    color:#0f9d58;
 }
 
 .error{
-    background:#ffe8e8;
-    color:#d62828;
+    background:#ffe9e9;
+    color:#d93025;
 }
 
 .loading{
-    background:#fff4e6;
+    background:#fff5e6;
     color:#fc8019;
 }
+
 .footer{
-    margin-top:18px;
+    margin-top:28px;
     text-align:center;
-    font-size:13px;
     color:#777;
+    font-size:16px;
 }
+
 </style>
 </head>
 
@@ -105,13 +116,22 @@ button:hover{
 
 <div class="container">
 
-    <div class="logo">Swiggy Checker</div>
-
-    <div class="inputBox">
-        <input type="tel" id="number" placeholder="Enter Mobile Number">
+    <div class="logo">
+        Swiggy Checker
     </div>
 
-    <button onclick="checkNumber()">Check Number</button>
+    <div class="inputBox">
+        <input
+            type="tel"
+            id="number"
+            maxlength="10"
+            placeholder="Enter Mobile Number"
+        >
+    </div>
+
+    <button onclick="checkNumber()">
+        Check Number
+    </button>
 
     <div id="result" class="result"></div>
 
@@ -122,46 +142,50 @@ button:hover{
 </div>
 
 <script>
+
 async function checkNumber(){
 
     const number = document.getElementById("number").value.trim();
+
     const resultBox = document.getElementById("result");
 
     if(number.length !== 10){
+
         resultBox.style.display = "block";
         resultBox.className = "result error";
-        resultBox.innerHTML = "Enter valid 10 digit number";
+        resultBox.innerHTML = "⚠ Enter Valid 10 Digit Number";
+
         return;
     }
 
     resultBox.style.display = "block";
     resultBox.className = "result loading";
-    resultBox.innerHTML = "Checking Number...";
+    resultBox.innerHTML = "⏳ Checking Number...";
 
     try{
 
-        const response = await fetch("https://www.swiggy.com/mapi/auth/signin-check",{
+        const response = await fetch("/api/check",{
+
             method:"POST",
+
             headers:{
                 "content-type":"application/json"
             },
+
             body:JSON.stringify({
-                mobile:number,
-                countryCode:"+91"
+                mobile:number
             })
+
         });
 
         const data = await response.json();
 
         console.log(data);
 
-        /*
-            Common response examples:
-            registered = true
-            registered = false
-        */
-
-        if(data.registered === true){
+        if(
+            data?.data?.is_registered === true ||
+            data?.registered === true
+        ){
 
             resultBox.className = "result success";
             resultBox.innerHTML = "✅ Registered On Swiggy";
@@ -178,11 +202,12 @@ async function checkNumber(){
         console.log(err);
 
         resultBox.className = "result error";
-        resultBox.innerHTML = "⚠ Request Failed / CORS Error";
+        resultBox.innerHTML = "⚠ Server Error";
 
     }
 
 }
+
 </script>
 
 </body>
