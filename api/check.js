@@ -1,40 +1,44 @@
 export default async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-  if (req.method === "OPTIONS") {
-    return res.status(200).end();
-  }
+    if (req.method !== "POST") {
+        return res.status(405).json({
+            success: false,
+            message: "Method not allowed"
+        });
+    }
 
-  if (req.method !== "POST") {
-    return res.status(405).json({
-      error: "Method not allowed"
-    });
-  }
+    try {
 
-  const { phone } = req.body;
+        const { mobile } = req.body;
 
-  if (!phone) {
-    return res.status(400).json({
-      error: "Phone number required"
-    });
-  }
+        const response = await fetch(
+            "https://www.swiggy.com/mapi/auth/signin-check",
+            {
+                method: "POST",
+                headers: {
+                    "content-type": "application/json",
+                    "user-agent": "Mozilla/5.0"
+                },
+                body: JSON.stringify({
+                    mobile,
+                    countryCode: "+91"
+                })
+            }
+        );
 
-  try {
-    const timestamp = Math.floor(Date.now() / 1000);
+        const data = await response.json();
 
-    const payload = {
-      type: "swiggy",
-      numbers: [phone],
-      timestamp
-    };
+        return res.status(200).json(data);
 
-    // Replace if API requires regenerated signature
-    const signature =
-      "36d4a89f0eca5ce0cb88efd7c68fff2eb5067e8fbc6d24e4c40f7ed5bd409a8a";
+    } catch (err) {
 
-    const response = await fetch(
+        return res.status(500).json({
+            success: false,
+            error: err.message
+        });
+
+    }
+}    const response = await fetch(
       "https://storelex.store/?api=1",
       {
         method: "POST",
