@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Registration Checkr</title>
+
+  <style>
+
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:Arial, sans-serif;
+    }
+
+    body{
+      background:#0f172a;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      min-height:100vh;
+      color:white;
+    }
+
+    .box{
+      width:90%;
+      max-width:380px;
+      background:#1e293b;
+      padding:25px;
+      border-radius:16px;
+      box-shadow:0 0 20px rgba(0,0,0,0.4);
+    }
+
+    h2{
+      text-align:center;
+      margin-bottom:20px;
+    }
+
+    input{
+      width:100%;
+      padding:14px;
+      border:none;
+      border-radius:10px;
+      outline:none;
+      margin-bottom:15px;
+      font-size:16px;
+    }
+
+    button{
+      width:100%;
+      padding:14px;
+      border:none;
+      border-radius:10px;
+      background:#2563eb;
+      color:white;
+      font-size:16px;
+      cursor:pointer;
+      transition:0.3s;
+    }
+
+    button:hover{
+      background:#1d4ed8;
+    }
+
+    #result{
+      margin-top:15px;
+      padding:14px;
+      border-radius:10px;
+      text-align:center;
+      display:none;
+      font-size:17px;
+      word-break:break-word;
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="box">
+
+  <h2>Registration Checker</h2>
+
+  <input
+    type="number"
+    id="mobile"
+    placeholder="Enter Mobile Number"
+  >
+
+  <button onclick="checkNumber()">
+    Check Number
+  </button>
+
+  <div id="result"></div>
+
+</div>
+
+<script>
+
+async function checkNumber(){
+
+  const mobile =
+    document.getElementById("mobile").value;
+
+  const result =
+    document.getElementById("result");
+
+  if(mobile.length < 10){
+
+    alert("Enter valid mobile number");
+    return;
+  }
+
+  result.style.display = "block";
+  result.style.background = "#1e40af";
+  result.innerHTML = "Checking...";
+
+  try{
+
+    const response = await fetch("https://clothpc.vercel.app/api/check", {
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body: JSON.stringify({
+        mobile: mobile
+      })
+    });
+
+    const data = await response.json();
+
+    console.log(data);
+
+    if(data.registered === true){
+
+      result.style.background = "#14532d";
+      result.innerHTML =
+        "✅ Registered Number";
+
+    }
+    else if(data.registered === false){
+
+      result.style.background = "#7f1d1d";
+      result.innerHTML =
+        "❌ Unregistered Number";
+
+    }
+    else{
+
+      result.style.background = "#1e40af";
+
+      result.innerHTML =
+        data.message ||
+        JSON.stringify(data);
+
+    }
+
+  }catch(err){
+
+    result.style.background = "#7f1d1d";
+    result.innerHTML = "Server Error";
+
+    console.log(err);
+  }
+}
+
+</script>
+
+</body>
+</html>
