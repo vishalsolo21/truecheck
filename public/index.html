@@ -3,55 +3,73 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Number Checker</title>
+  <title>Registration Checker</title>
 
   <style>
 
-    body{
+    *{
       margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:Arial, sans-serif;
+    }
+
+    body{
       background:#0f172a;
       display:flex;
       justify-content:center;
       align-items:center;
-      height:100vh;
-      font-family:Arial;
+      min-height:100vh;
       color:white;
     }
 
     .box{
-      width:340px;
+      width:90%;
+      max-width:380px;
       background:#1e293b;
       padding:25px;
-      border-radius:14px;
+      border-radius:16px;
+      box-shadow:0 0 20px rgba(0,0,0,0.4);
+    }
+
+    h2{
+      text-align:center;
+      margin-bottom:20px;
     }
 
     input{
       width:100%;
-      padding:13px;
+      padding:14px;
       border:none;
       border-radius:10px;
+      outline:none;
       margin-bottom:15px;
       font-size:16px;
-      box-sizing:border-box;
     }
 
     button{
       width:100%;
-      padding:13px;
+      padding:14px;
       border:none;
       border-radius:10px;
       background:#2563eb;
       color:white;
       font-size:16px;
       cursor:pointer;
+      transition:0.3s;
+    }
+
+    button:hover{
+      background:#1d4ed8;
     }
 
     #result{
       margin-top:15px;
-      padding:12px;
+      padding:14px;
       border-radius:10px;
       text-align:center;
       display:none;
+      font-size:17px;
     }
 
   </style>
@@ -87,6 +105,7 @@ async function checkNumber(){
     document.getElementById("result");
 
   if(mobile.length < 10){
+
     alert("Enter valid mobile number");
     return;
   }
@@ -109,17 +128,29 @@ async function checkNumber(){
 
     const data = await response.json();
 
-    if(data.registered){
+    const msg =
+      data.response?.msg || "";
+
+    if(msg.includes("Wrong Password")){
 
       result.style.background = "#14532d";
       result.innerHTML =
         "✅ Registered Number";
 
-    } else {
+    }
+    else if(
+      msg.includes("not a registered user")
+    ){
 
       result.style.background = "#7f1d1d";
       result.innerHTML =
         "❌ Unregistered Number";
+
+    }
+    else{
+
+      result.style.background = "#1e40af";
+      result.innerHTML = msg || "Unknown Response";
 
     }
 
