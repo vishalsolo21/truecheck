@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Registration Checker</title>
 
@@ -70,6 +70,7 @@
       text-align:center;
       display:none;
       font-size:17px;
+      word-break:break-word;
     }
 
   </style>
@@ -128,19 +129,16 @@ async function checkNumber(){
 
     const data = await response.json();
 
-    const msg =
-      data.response?.msg || "";
+    console.log(data);
 
-    if(msg.includes("Wrong Password")){
+    if(data.registered === true){
 
       result.style.background = "#14532d";
       result.innerHTML =
         "✅ Registered Number";
 
     }
-    else if(
-      msg.includes("not a registered user")
-    ){
+    else if(data.registered === false){
 
       result.style.background = "#7f1d1d";
       result.innerHTML =
@@ -150,7 +148,10 @@ async function checkNumber(){
     else{
 
       result.style.background = "#1e40af";
-      result.innerHTML = msg || "Unknown Response";
+
+      result.innerHTML =
+        data.message ||
+        JSON.stringify(data);
 
     }
 
