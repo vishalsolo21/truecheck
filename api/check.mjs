@@ -15,13 +15,21 @@ export default async function handler(req, res) {
       "https://www.brevistay.com/cst/app-api/login",
       {
         method: "POST",
+
         headers: {
-          "Accept": "application/json, text/plain, */*",
-          "Content-Type": "application/json",
-          "Authorization": "Bearer null",
+          "accept": "application/json, text/plain, */*",
+          "content-type": "application/json",
+          "authorization": "Bearer null",
           "brevi-channel": "MOBILE_WEB",
-          "brevi-channel-version": "41.0.0"
+          "brevi-channel-version": "41.0.0",
+
+          "origin": "https://www.brevistay.com",
+          "referer": "https://www.brevistay.com/",
+
+          "user-agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124 Safari/537.36"
         },
+
         body: JSON.stringify({
           is_otp: 0,
           is_password: 1,
@@ -32,14 +40,29 @@ export default async function handler(req, res) {
       }
     );
 
-    const data = await response.json();
+    const text = await response.text();
+
+    let data;
+
+    try {
+
+      data = JSON.parse(text);
+
+    } catch {
+
+      return res.status(500).json({
+        success: false,
+        error: "Non-JSON Response",
+        raw: text.slice(0, 500)
+      });
+    }
 
     const registered =
       data?.msg === "Wrong Password";
 
     return res.status(200).json({
       success: true,
-      registered: registered,
+      registered,
       response: data
     });
 
