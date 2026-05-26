@@ -36,7 +36,9 @@ export default async function handler(req, res) {
 
     return res.status(200).json({
       success: true,
-      registered: data.is_user_registered == "1",
+      registered:
+  data.msg &&
+  data.msg.includes("Wrong Password"),
       response: data
     });
 
