@@ -1,159 +1,60 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Number Registration Checker</title>
-
-  <style>
-    *{
-      margin:0;
-      padding:0;
-      box-sizing:border-box;
-      font-family:Arial, sans-serif;
-    }
-
-    body{
-      background:#0f172a;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      min-height:100vh;
-      color:white;
-    }
-
-    .container{
-      width:90%;
-      max-width:400px;
-      background:#1e293b;
-      padding:25px;
-      border-radius:15px;
-      box-shadow:0 0 20px rgba(0,0,0,0.4);
-    }
-
-    h2{
-      text-align:center;
-      margin-bottom:20px;
-    }
-
-    input{
-      width:100%;
-      padding:14px;
-      border:none;
-      border-radius:10px;
-      outline:none;
-      margin-bottom:15px;
-      font-size:16px;
-    }
-
-    button{
-      width:100%;
-      padding:14px;
-      border:none;
-      border-radius:10px;
-      background:#2563eb;
-      color:white;
-      font-size:16px;
-      cursor:pointer;
-      transition:0.3s;
-    }
-
-    button:hover{
-      background:#1d4ed8;
-    }
-
-    .result{
-      margin-top:20px;
-      padding:15px;
-      border-radius:10px;
-      text-align:center;
-      font-size:18px;
+      border-radius:8px;
       display:none;
-    }
-
-    .registered{
-      background:#14532d;
-      color:#86efac;
-    }
-
-    .unregistered{
-      background:#7f1d1d;
-      color:#fca5a5;
-    }
-
-    .loading{
-      background:#1e40af;
-      color:white;
+      text-align:center;
     }
   </style>
 </head>
 <body>
 
-<div class="container">
-  <h2>Registration Checker</h2>
+<div class="box">
+  <h2>Number Checker</h2>
 
-  <input type="number" id="mobile" placeholder="Enter Mobile Number" />
+  <input type="number" id="mobile" placeholder="Enter Mobile Number">
 
-  <button onclick="checkNumber()">Check Number</button>
+  <button onclick="checkNumber()">Check</button>
 
-  <div id="result" class="result"></div>
+  <div id="result"></div>
 </div>
 
 <script>
-async function checkNumber() {
+async function checkNumber(){
 
   const mobile = document.getElementById("mobile").value;
-  const resultBox = document.getElementById("result");
+  const result = document.getElementById("result");
 
-  if (mobile.length < 10) {
-    alert("Enter valid mobile number");
+  if(mobile.length < 10){
+    alert("Enter valid number");
     return;
   }
 
-  resultBox.style.display = "block";
-  resultBox.className = "result loading";
-  resultBox.innerHTML = "Checking...";
+  result.style.display = "block";
+  result.innerHTML = "Checking...";
 
-  try {
+  try{
 
-    const response = await fetch("https://www.brevistay.com/cst/app-api/login", {
-      method: "POST",
-      headers: {
-        "Accept": "application/json, text/plain, */*",
-        "Content-Type": "application/json",
-        "Authorization": "Bearer null",
-        "brevi-channel": "MOBILE_WEB",
-        "brevi-channel-version": "41.0.0"
+    const response = await fetch("/api/check", {
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
       },
-      body: JSON.stringify({
-        is_otp: 0,
-        is_password: 1,
-        mobile: mobile,
-        password: "isiwisi",
-        usr_fcm_token: ""
-      })
+      body: JSON.stringify({ mobile })
     });
 
     const data = await response.json();
 
-    if (data.is_user_registered == "1") {
-
-      resultBox.className = "result registered";
-      resultBox.innerHTML = "✅ Number Registered";
-
-    } else {
-
-      resultBox.className = "result unregistered";
-      resultBox.innerHTML = "❌ Number Unregistered";
-
+    if(data.registered){
+      result.style.background = "#14532d";
+      result.innerHTML = "✅ Registered Number";
+    }else{
+      result.style.background = "#7f1d1d";
+      result.innerHTML = "❌ Unregistered Number";
     }
 
-  } catch (error) {
-
-    resultBox.className = "result unregistered";
-    resultBox.innerHTML = "Server Error";
-
-    console.log(error);
+  }catch(err){
+    result.style.background = "#7f1d1d";
+    result.innerHTML = "Server Error";
+    console.log(err);
   }
 }
 </script>
