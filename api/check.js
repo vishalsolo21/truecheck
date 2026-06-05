@@ -1,24 +1,18 @@
 export default async function handler(req, res) {
   try {
+    const { number } = req.query;
 
-    const number = req.query.number;
+    const response = await fetch(
+      `https://ye-lo-mojkro.noob73613.workers.dev/?api_key=@noob11001&number=${number}`
+    );
 
-    const api =
-      `https://ye-lo-mojkro.noob73613.workers.dev/?api_key=@noob11001&number=${number}`;
+    const data = await response.json();
 
-    const response = await fetch(api);
-
-    const text = await response.text();
-
-    res.setHeader("Content-Type", "application/json");
-
-    return res.status(200).send(text);
+    return res.status(200).json(data.first_match || {});
 
   } catch (err) {
-
     return res.status(500).json({
       error: err.message
     });
-
   }
 }
