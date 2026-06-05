@@ -151,32 +151,60 @@ async function checkData(){
     result.innerHTML = "";
 
     try{
+const response = await fetch(`/api/check?number=${number}`);
+const data = await response.json();
 
-        const response = await fetch(`/api/check?number=${number}`);
-
-const text = await response.text();
-
-console.log(text);
-
-document.getElementById("result").innerHTML =
-    `<pre>${text}</pre>`;
-    }
-    catch(error){
-
-        document.getElementById("loading").style.display =
-            "none";
-
-        result.innerHTML =
-            `<pre>Error:\n${escapeHtml(error.toString())}</pre>`;
-    }
+if (!data.first_match) {
+    result.innerHTML = "<div class='error'>No Data Found</div>";
+    return;
 }
 
-function escapeHtml(text){
-    return text
-        .replace(/&/g,"&amp;")
-        .replace(/</g,"&lt;")
-        .replace(/>/g,"&gt;");
-}
+const user = data.first_match;
+
+result.innerHTML = `
+<table>
+    <tr>
+        <td>Mobile</td>
+        <td>${user.mobile || "-"}</td>
+    </tr>
+
+    <tr>
+        <td>Name</td>
+        <td>${user.name || "-"}</td>
+    </tr>
+
+    <tr>
+        <td>Father Name</td>
+        <td>${user.fname || "-"}</td>
+    </tr>
+
+    <tr>
+        <td>Address</td>
+        <td>${user.address || "-"}</td>
+    </tr>
+
+    <tr>
+        <td>Alternate</td>
+        <td>${user.alt || "-"}</td>
+    </tr>
+
+    <tr>
+        <td>Circle</td>
+        <td>${user.circle || "-"}</td>
+    </tr>
+
+    <tr>
+        <td>ID</td>
+        <td>${user.id || "-"}</td>
+    </tr>
+
+    <tr>
+        <td>Email</td>
+        <td>${user.email || "-"}</td>
+    </tr>
+</table>
+`;
+        
 </script>
 
 </body>
